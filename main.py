@@ -42,22 +42,49 @@ def generate_gaant(df):
 
     gaant_figure = ff.create_gantt(df, index_col='Resource', show_colorbar=True, show_hover_fill=True, group_tasks=True, height=height)
 
-    gaant_figure.add_shape(
+    hours_mark = []
+    for i in range(12):
+        zero_hour = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        start_hour = zero_hour + timedelta(hours=(2 * i))
+        finish_hour = start_hour + timedelta(hours=1)
+
+        hours_mark.append(
             go.layout.Shape(
-                type="line",
+                type="rect",
+                xref="x",
                 yref="paper",
-                x0=datetime.now(),
+                x0=start_hour,
                 y0=0,
-                x1=datetime.now(),
+                x1=finish_hour,
                 y1=1,
-                label=dict(
-                    text='Now'
-                ),
-                line=dict(
-                    color="RoyalBlue",
-                    width=3
-                )
-    ))
+                fillcolor="LightSalmon",
+                opacity=0.2,
+                layer="below",
+                line_width=0
+            )
+        )
+
+    gaant_figure.update_layout(
+        shapes=hours_mark
+    )
+
+    gaant_figure.add_shape(
+        go.layout.Shape(
+            type="line",
+            yref="paper",
+            x0=datetime.now(),
+            y0=0,
+            x1=datetime.now(),
+            y1=1,
+            label=dict(
+                text='Now'
+            ),
+            line=dict(
+                color="RoyalBlue",
+                width=3
+            )
+        )
+    )
     return gaant_figure
 
 crontab_info_default = """# This is an example of crontab -l return
@@ -68,7 +95,7 @@ crontab_info_default = """# This is an example of crontab -l return
 0 12 * * * Task 4
 40 15 * * * Task 5
 */30 * * * * Task 6
-* */20 * * * Task 7
+35 */20 * * * Task 7
 5 5 * * * Task 8
 45 8 * * * Task 9
 */10 9 * * * Task 10
